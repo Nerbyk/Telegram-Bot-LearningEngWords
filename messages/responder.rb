@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
+require 'dotenv'
+Dotenv.load('./.env')
+
 class MessageResponder
-  attr_reader :bot, :message, :db, :user_input
+  attr_reader :bot, :message, :db, :user_input, :id
   def call(bot:, message:, db:, user_input:)
     @bot = bot
     @message = message
@@ -27,14 +30,16 @@ class MessageResponder
   end
 
   def main_menu
-    send_message('Choose right option:\n/new - start learning new words\n/repeat - repeat already learned words\n/update_db - update database by adding new words from spreadseet\n/progress - get learning progress message')
+    send_message("Choose right option:\n/new - start learning new words\n/repeat - repeat already learned words\n/update_db - update database by adding new words from spreadseet\n/progress - get learning progress message")
   end
 
   def update_db
     db.parse_spreadsheet
   end
 
+  def start_learning; end
+
   def send_message(text)
-    bot.api.send_message(user_id: id, text: text)
+    bot.api.send_message(chat_id: id, text: text)
   end
 end
