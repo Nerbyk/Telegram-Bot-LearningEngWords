@@ -6,9 +6,9 @@ As you may have noticed while surfing my github (or not, google translate onelov
 
 * Get a number of words you want to learn by now
 * Provide algorithm of learning 
- * see part of the words separately
- * choose one currect option of translation 
- * write currect translation of a word 
+    * see part of the words separately
+    * choose one currect option of translation 
+    * write currect translation of a word 
 * Repetition exercise 
 
 ## Features
