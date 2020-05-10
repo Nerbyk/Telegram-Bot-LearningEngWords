@@ -2,13 +2,18 @@
 
 require './db/db'
 require './messages/actions/to_learn_menu.rb'
+require './messages/actions/learning_alg.rb'
+require 'singleton'
 
 class Invoker
-  attr_reader :history
+  include Singleton
+  attr_reader :history, :requests
 
   def execute(cmd)
     @history ||= []
     @history << cmd.execute
+    @requests ||= []
+    @requests << BotOptions.instance.message.text
   end
 end
 
@@ -36,6 +41,24 @@ class NewCommand < Command
   end
 end
 
+class NewGetCommand < Command
+  def execute
+    request.new_list_get_amount
+  end
+end
+
+class StartLessonCommand < Command
+  def execute
+    request.start_lesson
+  end
+end
+
+class LookLessonWordsCommand < Command
+  def execute
+    request.look_at_list
+  end
+end
+
 class RepeatCommand < Command
   def execute
     request.repeat
@@ -60,7 +83,32 @@ class Receiver
   end
 
   def new_list
+    ToLearn.new.send_request
+  end
+
+  def new_list_get_amount
     ToLearn.new.get_amount
+  end
+
+  def start_lesson
+    if Learning.instance.words.nil?
+      BotOptions.instance.send_message('you can\'t  use this command, while list of words wasn\'t initialized')
+    else
+      p Invoker.instance.requests
+      if Invoker.instance.requests.last == '/look_at_list'
+        BotOptions.instance.delete_last_message
+      end
+      p Invoker.instance.requests
+      Learning.instance.start_lesson
+    end
+  end
+
+  def look_at_list
+    if Learning.instance.words.nil?
+      BotOptions.instance.send_message('you can\'t use this command, while list of words wasn\'t initialized')
+    else
+      Learning.instance.look_at_list
+    end
   end
 
   def repeat
@@ -76,16 +124,12 @@ class Receiver
   def progress
     send_message('progress command entered')
   end
-
-  def send_message(text)
-    BotOptions.instance.send_message(text)
-  end
 end
 
 class AnswerClient
   def initialize
     @receiver = Receiver.new
-    @invoker  = Invoker.new
+    @invoker  = Invoker.instance
   end
 
   def respond_to(cmd)
@@ -95,6 +139,12 @@ class AnswerClient
     when '/repeat' then @invoker.execute(RepeatCommand.new(@receiver))
     when '/update_db' then @invoker.execute(UpdateDbCommand.new(@receiver))
     when '/progress' then @invoker.execute(ProgressCommand.new(@receiver))
+    when '/start_lesson' then @invoker.execute(StartLessonCommand.new(@receiver))
+    when '/look_at_list' then @invoker.execute(LookLessonWordsCommand.new(@receiver))
+    else
+      if @invoker.requests.last == '/new'
+        @invoker.execute(NewGetCommand.new(@receiver))
+      end
     end
   end
 end
