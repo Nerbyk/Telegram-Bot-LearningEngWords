@@ -6,10 +6,8 @@ require 'dotenv'
 
 Dotenv.load('./.env')
 
-require './db/db.rb'
 require './messages/responder.rb'
 require './messages/button_responder.rb'
-db = DB.new
 
 Telegram::Bot::Client.run(ENV['TOKEN']) do |bot|
   bot.listen do |message|
@@ -18,10 +16,10 @@ Telegram::Bot::Client.run(ENV['TOKEN']) do |bot|
         case message
         when Telegram::Bot::Types::CallbackQuery
           message_button = MessageButton.new
-          message_button.call(bot: bot, message: message, db: db)
+          message_button.call(bot: bot, message: message)
         else
           message_responder = MessageResponder.new
-          message_responder.call(bot: bot, message: message, db: db, user_input: message.text)
+          message_responder.call(bot: bot, message: message, user_input: message.text)
         end
       rescue StandardError => e
         bot.api.send_message(chat_id: message.from.id, text: "Error: #{e}")
