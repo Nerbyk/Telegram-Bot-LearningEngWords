@@ -6,11 +6,12 @@ require 'singleton'
 require './db/spreadsheet/spreadsheet_parser.rb'
 require './operations/status_constants.rb'
 
-class DbInit
+class Db
+  include Singleton
   attr_reader :db, :dataset, :table
   def initialize
-    @db = Sequel.sqlite('./db/my_dictionary.db')
-    @table = :words_list
+    @db      = Sequel.sqlite('./db/my_dictionary.db')
+    @table   = :words_list
     @dataset = create
   end
 
@@ -35,13 +36,5 @@ class DbInit
 
   def get_words(amount, status)
     # TODO: return array of randomly chosen rows, length == amount, sort by status
-  end
-end
-
-class DB
-  attr_reader :db
-  include Singleton
-  def initialize
-    @db = DbInit.new
   end
 end
