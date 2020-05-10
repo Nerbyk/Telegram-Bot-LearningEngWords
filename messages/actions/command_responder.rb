@@ -59,6 +59,12 @@ class LookLessonWordsCommand < Command
   end
 end
 
+class ResetLessonCommand < Command
+  def execute
+    request.reset_lesson
+  end
+end
+
 class RepeatCommand < Command
   def execute
     request.repeat
@@ -79,7 +85,7 @@ end
 
 class Receiver
   def start
-    send_message("Choose right option:\n/new - start learning new words\n/repeat - repeat already learned words\n/update_db - update database by adding new words from spreadseet\n/progress - get learning progress message")
+    BotOptions.instance.send_message("Choose right option:\n/new - start learning new words\n/repeat - repeat already learned words\n/update_db - update database by adding new words from spreadseet\n/progress - get learning progress message")
   end
 
   def new_list
@@ -111,6 +117,12 @@ class Receiver
     end
   end
 
+  def reset_lesson
+    Learning.instance.words = nil
+    Learning.instance.status = nil
+    start
+  end
+
   def repeat
     send_message('repeat message entered')
   end
@@ -134,13 +146,14 @@ class AnswerClient
 
   def respond_to(cmd)
     case cmd
-    when '/start' then @invoker.execute(StartCommand.new(@receiver))
-    when '/new' then @invoker.execute(NewCommand.new(@receiver))
-    when '/repeat' then @invoker.execute(RepeatCommand.new(@receiver))
-    when '/update_db' then @invoker.execute(UpdateDbCommand.new(@receiver))
-    when '/progress' then @invoker.execute(ProgressCommand.new(@receiver))
+    when '/start'        then @invoker.execute(StartCommand.new(@receiver))
+    when '/new'          then @invoker.execute(NewCommand.new(@receiver))
+    when '/repeat'       then @invoker.execute(RepeatCommand.new(@receiver))
+    when '/update_db'    then @invoker.execute(UpdateDbCommand.new(@receiver))
+    when '/progress'     then @invoker.execute(ProgressCommand.new(@receiver))
     when '/start_lesson' then @invoker.execute(StartLessonCommand.new(@receiver))
     when '/look_at_list' then @invoker.execute(LookLessonWordsCommand.new(@receiver))
+    when '/reset_lesson' then @invoker.execute(ResetLessonCommand.new(@receiver))
     else
       if @invoker.requests.last == '/new'
         @invoker.execute(NewGetCommand.new(@receiver))
