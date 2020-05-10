@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require './db/db'
+require './messages/actions/to_learn_menu.rb'
 
 class Invoker
   attr_reader :history
@@ -59,7 +60,7 @@ class Receiver
   end
 
   def new_list
-    send_message('new list command')
+    ToLearn.new.get_amount
   end
 
   def repeat

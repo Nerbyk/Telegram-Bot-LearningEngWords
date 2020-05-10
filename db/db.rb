@@ -35,6 +35,15 @@ class Db
   end
 
   def get_words(amount, status)
+    words = dataset.select_map(%i[eng ru status])
+    words = words.map { |row| row.delete(row) if row[2] != status }.uniq
+    lesson_words = []
+    (1..amount.to_i).each do |_i|
+      random_number = rand(words.length - 1)
+      lesson_words << words[random_number]
+    end
+    p lesson_words
+    lesson_words
     # TODO: return array of randomly chosen rows, length == amount, sort by status
   end
 end
