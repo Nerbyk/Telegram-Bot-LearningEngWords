@@ -36,14 +36,18 @@ class Db
 
   def get_words(amount, status)
     words = dataset.select_map(%i[eng ru status])
-    words = words.map { |row| row.delete(row) if row[2] != status }.uniq
+    # returns word pairs according to spec. status
+    words = words.map do |row|
+      row.delete(row) if row[2] != status
+      row[0..1]
+    end
     lesson_words = []
-    (1..amount.to_i).each do |_i|
+    # returns spec. amount of word pairs randomly chosen  without matching
+    (1..amount).each do |_i|
       random_number = rand(words.length - 1)
       lesson_words << words[random_number]
+      words.delete(words[random_number])
     end
-    p lesson_words
     lesson_words
-    # TODO: return array of randomly chosen rows, length == amount, sort by status
   end
 end
