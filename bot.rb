@@ -22,6 +22,10 @@ class BotOptions
   def send_message(text)
     bot.api.send_message(chat_id: message.from.id, text: text)
   end
+
+  def delete_last_message
+    bot.api.delete_message(chat_id: message.from.id, message_id: message.message_id - 1)
+  end
 end
 
 Telegram::Bot::Client.run(ENV['TOKEN']) do |bot|
