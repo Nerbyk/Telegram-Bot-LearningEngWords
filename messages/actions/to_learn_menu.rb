@@ -2,6 +2,7 @@
 
 require './operations/status_constants.rb'
 require './messages/actions/to_learn_menu.rb'
+require './messages/actions/learning_alg.rb'
 require './db/db.rb'
 
 class ToLearn
@@ -12,11 +13,17 @@ class ToLearn
     @user_input  = bot_options.message.text
   end
 
-  def get_amount
+  def send_request
     bot_options.send_message('Enter number of words you want to learn for now (from 10 to 25 recomended)')
-    p user_input
+  end
+
+  def get_amount
     amount = user_input
-    Db.instance.get_words(amount, status)
+    words = Db.instance.get_words(amount.to_i, status)
+    to_learn = Learning.instance
+    to_learn.status = status
+    to_learn.words  = words
+    to_learn.menu
     # Learning.new.menu(Db.instance.get_words(amount, status))
   end
 end
