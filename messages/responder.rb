@@ -6,10 +6,10 @@ Dotenv.load('./.env')
 
 class MessageResponder
   attr_reader :bot, :message, :user_input, :id
-  def call(bot:, message:, user_input:)
+  def initialize(bot:, message:)
     @bot        = bot
     @message    = message
-    @user_input = user_input
+    @user_input = message.text
     @id         = ENV['USER_ID'].to_i
     respond
   end

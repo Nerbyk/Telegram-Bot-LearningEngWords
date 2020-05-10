@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require './db/db'
+
 class Invoker
   attr_reader :history
 
@@ -52,14 +54,6 @@ class ProgressCommand
 end
 
 class Receiver
-  attr_reader :bot, :message, :db, :id
-  def initialize(bot:, message:, db:, id:)
-    @bot = bot
-    @message = message
-    @db = db
-    @id = id
-  end
-
   def start
     send_message("Choose right option:\n/new - start learning new words\n/repeat - repeat already learned words\n/update_db - update database by adding new words from spreadseet\n/progress - get learning progress message")
   end
@@ -73,7 +67,7 @@ class Receiver
   end
 
   def update_db
-    db.parse_spreadsheet
+    Db.instance.parse_spreadsheet
     send_message('database updated, new words were uploaded.')
     start
   end
@@ -83,19 +77,14 @@ class Receiver
   end
 
   def send_message(text)
-    bot.api.send_message(chat_id: id, text: text)
+    BotOptions.instance.send_message(text)
   end
 end
 
 class AnswerClient
-  attr_reader :invoker, :bot, :message, :db, :id
-  def initialize(bot:, message:, db:, id:)
-    @bot        = bot
-    @message    = message
-    @db         = db
-    @id         = id
-    @receiver = Receiver.new(bot: bot, message: message, db: db, id: id)
-    @invoker = Invoker.new
+  def initialize
+    @receiver = Receiver.new
+    @invoker  = Invoker.new
   end
 
   def respond_to(cmd)
