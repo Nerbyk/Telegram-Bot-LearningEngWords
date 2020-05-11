@@ -100,11 +100,9 @@ class Receiver
     if Learning.instance.words.nil?
       BotOptions.instance.send_message('you can\'t  use this command, while list of words wasn\'t initialized')
     else
-      p Invoker.instance.requests
       if Invoker.instance.requests.last == '/look_at_list'
         BotOptions.instance.delete_last_message
       end
-      p Invoker.instance.requests
       Learning.instance.start_lesson
     end
   end
