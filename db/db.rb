@@ -50,4 +50,8 @@ class Db
     end
     lesson_words
   end
+
+  def get_all_ru
+    dataset.select_map(%i[ru])
+  end
 end
