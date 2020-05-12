@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'singleton'
-require './messages/actions/start_lesson.rb'
+require './messages/actions/lesson_algorithm/start_lesson.rb'
 class Learning
   include Singleton
   attr_accessor :bot_options, :status, :words
@@ -16,7 +16,7 @@ class Learning
   end
 
   def start_lesson
-    StartLesson.new(words)
+    StartLessonOptions.new
   end
 
   def look_at_list
