@@ -14,17 +14,27 @@ class Learning
   def menu
     bot_options.send_message("Enter:\n /start_lesson - To start lesson\n /look_at_list - To look at the list of words in this lesson\n /reset_lesson - To return to main menu and to reset list of words")
   end
+end
 
-  def start_lesson
+class LearningMenu
+  def item(words: nil)
+    raise NotImplementedError
+  end
+end
+
+class StartLesson < LearningMenu
+  def item(words: nil)
     StartLessonOptions.new
   end
+end
 
-  def look_at_list
+class CheckLesson < LearningMenu
+  def item(words: Learning.instance.words)
     demonstrate_string = ''
     words.each do |row|
       demonstrate_string += row[0] + ' - ' + row[1] + "\n"
     end
     demonstrate_string += "----------\n /start_lesson - To start lesson\n /reset_lesson - To return to main menu and to reset list of words"
-    bot_options.send_message(demonstrate_string)
+    BotOptions.instance.send_message(demonstrate_string)
   end
 end

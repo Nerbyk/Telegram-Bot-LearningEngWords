@@ -103,7 +103,7 @@ class Receiver
       if Invoker.instance.requests.last == '/look_at_list'
         BotOptions.instance.delete_last_message
       end
-      Learning.instance.start_lesson
+      StartLesson.new.item
     end
   end
 
@@ -111,7 +111,7 @@ class Receiver
     if Learning.instance.words.nil?
       BotOptions.instance.send_message('you can\'t use this command, while list of words wasn\'t initialized')
     else
-      Learning.instance.look_at_list
+      CheckLesson.new.item
     end
   end
 
