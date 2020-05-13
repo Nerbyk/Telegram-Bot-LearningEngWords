@@ -15,6 +15,8 @@ class Db
     @dataset = create
   end
 
+  private
+
   def create
     db.create_table? table do
       String :eng
@@ -23,6 +25,8 @@ class Db
     end
     dataset = db[table]
   end
+
+  public
 
   def parse_spreadsheet
     array_of_new_words = Spreadsheet.new

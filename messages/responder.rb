@@ -14,6 +14,8 @@ class MessageResponder
     respond
   end
 
+  private
+
   def respond
     client = AnswerClient.new
     client.respond_to(user_input)
