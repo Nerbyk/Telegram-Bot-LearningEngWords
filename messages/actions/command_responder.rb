@@ -103,7 +103,7 @@ class Receiver
       if Invoker.instance.requests.last == '/look_at_list'
         BotOptions.instance.delete_last_message
       end
-      StartLesson.new.item
+      InvokeLesson.new.item
     end
   end
 
