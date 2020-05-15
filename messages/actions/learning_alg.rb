@@ -2,6 +2,7 @@
 
 require 'singleton'
 require './messages/actions/lesson_algorithm/start_lesson.rb'
+
 class Learning
   include Singleton
   attr_accessor :bot_options, :status, :words
@@ -22,9 +23,9 @@ class LearningMenu
   end
 end
 
-class StartLesson < LearningMenu
+class InvokeLesson < LearningMenu
   def item(words: nil)
-    StartLessonOptions.new
+    StartLesson.new
   end
 end
 

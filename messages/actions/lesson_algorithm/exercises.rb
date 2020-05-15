@@ -2,11 +2,17 @@
 
 require 'singleton'
 require './messages/actions/lesson_algorithm/start_lesson.rb'
-class ExercisesForLesson < StartLessonOptions
-  attr_reader :bot_options, :steps, :writing_ex_words
+require './db/db.rb'
+require './operations/inline_markup_generator.rb'
+
+class ExercisesForLesson
+  attr_reader :case_bot_options, :steps, :writing_ex_words, :words
   include Singleton
   def initialize
-    super(words, bot_options, steps, writing_ex_words)
+    @words            = Learning.instance.words
+    @steps            = 0
+    @writing_ex_words = []
+    @case_bot_options = CaseBotOptions.instance
   end
 
   def get_steps
@@ -16,8 +22,8 @@ class ExercisesForLesson < StartLessonOptions
   def demonstrate_words
     # markup = MakeInlineMarkup.new(['Группа ВК', 'https://vk.com/pozor.brno'], ['Telegram Канал', 'https://t.me/pozor_brno']).get_link
     (0..steps).each do |i|
-      bot_options.send_message("#{words[i][0]} - #{words[i][1]}") if i == 0
-      edit_message("#{words[i][0]} - #{words[i][1]}") if i > 0
+      case_bot_options.send_message("#{words[i][0]} - #{words[i][1]}") if i == 0
+      case_bot_options.edit_message("#{words[i][0]} - #{words[i][1]}") if i > 0
       sleep(1)
     end
   end
@@ -26,25 +32,32 @@ class ExercisesForLesson < StartLessonOptions
     i = 0
     loop do
       break if i == steps
-
       variants = get_random_variant(words[i][1])
-      p variants
       #   bottom_keyboard = MakeInlineMarkup.new(%w[Химия История Физика], %w[Биология Информатика], %w[Английский География], 'Закончить Ввод').get_board
-      markup = MakeInlineMarkup.new([variants[0], variants[1]], [variants[2], variants[3]]).get_board
-      p markup
-      edit_message("Correct translation of the word #{words[i][0]}(use inline keyboard to enter answer, u have 10 seconds to answer)", markup)
+      markup = []
+      markup = MakeInlineMarkup([variants[0], variants[1]], [variants[2], variants[3]]).get_board
+      if i == 0 
+        case_bot_options.delete_message 
+        case_bot_options.send_message("Correct translation of the word(use inline keyboard to enter answer, u have 10 seconds to answer)\n\n#{words[i][0]}", markup)
+      elsif i > 0 && i != steps-1
+        case_bot_options.delete_message(1)
+        case_bot_options.send_message("Correct translation of the word(use inline keyboard to enter answer, u have 10 seconds to answer)\n\n#{words[i][0]}", markup)
+      elsif i == steps-1
+        
+      end
+      case_bot_options.edit_message("Correct translation of the word(use inline keyboard to enter answer, u have 10 seconds to answer)\n\n#{words[i][0]}", markup)
       sleep(10)
       if check_answer(words[i][1])
         writing_ex_words << words[i]
         i += 1
       else
-        edit_message("It's incorrect answer\n #{words[i]}")
+        case_bot_options.edit_message("It's incorrect answer\n #{words[i]}")
       end
     end
   end
 
   def check_answer(correct)
-    correct == case_message.text
+    correct == case_bot_options.message.text
   end
 
   def get_random_variant(correct_variant)
@@ -54,10 +67,5 @@ class ExercisesForLesson < StartLessonOptions
       variants << all_ru_words_to_shuffle[rand(all_ru_words_to_shuffle.length - 1)]
     end
     variants.shuffle.flatten
-  end
-
-  def edit_message(text, keyboard = nil)
-    p keyboard
-    bot_options.bot.api.edit_message_text(chat_id: @case_message.from.id, message_id: @case_message.message_id + 1, text: text, reply_markup: keyboard)
   end
 end
