@@ -26,10 +26,10 @@ class CaseBotOptions
 end
 
 class StartLesson
-  attr_reader :exercise, :case_bot_options, :words
+  attr_reader :lesson, :case_bot_options, :words
   def initialize
+    @lesson           = AbstractLesson.instance
     @case_bot_options = CaseBotOptions.instance
-    @exercise         = ExercisesForLesson.instance
     @words            = Learning.instance.words
     start_lesson
   end
@@ -44,9 +44,9 @@ class StartLesson
         return false if message.text == '/interrup_lesson'
         break if words.empty?
 
-        exercise.get_steps         unless exercise.words.empty?
-        exercise.demonstrate_words unless exercise.words.empty?
-        exercise.picking_exercise  unless exercise.words.empty?
+        GetStepsExercise.call      unless lesson.words.emply?
+        DemonstrateExercise.call   unless lesson.words.empty?
+        PickingExercise.call       unless lesson.words.empty?
       end
     end
   end
